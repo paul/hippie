@@ -1,0 +1,39 @@
+
+# Examples
+
+## Parallel requests
+
+```ruby
+
+client = Http2::Client.new
+
+users = %w[paul pezra]
+
+responses = users.map do |login|
+  client.get("https://api.github.com/users/#{login}")
+end
+
+# => ResponseFuture objects, requests have begin in parallel
+
+p responses.map(&:statuses)
+# Blocks until responses sends at least a complete status line + header
+# => [200, 200]
+
+responses.first.body
+# IO-like object with the streaming body
+
+```
+
+## Streaming parsers
+
+```ruby
+Http2::Client.new do |c|
+  parser = Yajl::Parser.new(opts)
+  c.parsers[Mime::JSON] = -> { |io| parser.parse(io) }
+end
+```
+
+Also, streaming for SSL, gzip/deflate, etc...
+
+
+
