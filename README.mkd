@@ -1,39 +1,89 @@
 
 # Examples
 
+## The easy way
+
+```ruby
+resp = Http2.get("https://api.github.com/users/paul")
+resp.status_code               # (or #status, or #code)
+#=> 200
+resp.headers['content-type']   # (or :content_type)
+#=> "application/json; charset=utf8"
+resp.encoding
+#=> "utf-8"
+resp.body
+#=> "{\"type\":\"User\"...}"
+resp.raw_body
+#=> #<IO...>
+```
+
 ## Parallel requests
 
-```ruby
-
-client = Http2::Client.new
-
-users = %w[paul pezra]
-
-responses = users.map do |login|
-  client.get("https://api.github.com/users/#{login}")
-end
-
-# => ResponseFuture objects, requests have begin in parallel
-
-p responses.map(&:statuses)
-# Blocks until responses sends at least a complete status line + header
-# => [200, 200]
-
-responses.first.body
-# IO-like object with the streaming body
-
-```
-
-## Streaming parsers
+`Http2` uses futures to make requests in parallel. Making a request doesn't block
+until you inspect certain attributes of the response.
 
 ```ruby
-Http2::Client.new do |c|
-  parser = Yajl::Parser.new(opts)
-  c.parsers[Mime::JSON] = -> { |io| parser.parse(io) }
-end
+r1 = Http2.get("https://api.github.com/users/paul")
+#=> #<Response:0x000... @state="connecting">
+r2 = Http2.get("https://api.github.com/users/pezra")
+#=> #<Response:0x001... @state="connecting">
+
+r1.status
+# Blocks until server sends at least a complete status line + header
+#=> 200
+r2.raw_body
+# Blocks until server starts sending the body, then returns the body as an IO stream
+# as the client gets it
+#=> #<IO...>
 ```
 
-Also, streaming for SSL, gzip/deflate, etc...
+## Sessions
+
+Sessions are a series of requests where auth and cookies are persisted, request
+headers are remembered, redirects are automatically followed (according to
+spec), etc. Calling `Http2` request class methods creates a implicit, global
+session, so you should probably avoid that in practice, and use this explicit
+Session object instead.
+
+```ruby
+s = Http2::Session.new
+s.auth = {user: "login", password: "token"}
+s.headers.update accept: 'application/vnd.github.v3+json')
+s.proto = "https"
+s.host  = "api.github.com"
+
+# Sends the Authentication and Accept header, and uses https://api.githubcom
+resp = s.get("/user")
+resp.status
+#=> 200
+```
+
+## Hooks
+
+Add your own custom parsing functions, by giving an object that responds to `#call`, and returns the response.
+You can also add a `#applicable?(response)` method to decide if the hook should be called.
+
+```ruby
+class JsonParser
+  def applicable?(response)
+    response.content_type == Mime::JSON
+  end
+
+  def call(response)
+    parser = Yajl::Parser.new
+    response.body = parser.parse(response.raw_body)
+  end
+end
+
+s = Http2::Session.new
+s.response_hooks.append(JsonParser.new)
+
+resp = s.get("https://api.github.com/users/paul")
+resp.body
+#=> {"type":"User"...}
+```
+
+
 
 
 
