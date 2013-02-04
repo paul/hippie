@@ -1,3 +1,5 @@
+require "http2/header"
+
 module Http2
   class Response
     attr_reader :state

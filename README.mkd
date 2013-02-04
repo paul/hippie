@@ -24,9 +24,9 @@ until you inspect certain attributes of the response.
 
 ```ruby
 r1 = Http2.get("https://api.github.com/users/paul")
-#=> #<Response:0x000... @state="connecting">
+#=> #<Response:0x000...>
 r2 = Http2.get("https://api.github.com/users/pezra")
-#=> #<Response:0x001... @state="connecting">
+#=> #<Response:0x001...>
 
 r1.status
 # Blocks until server sends at least a complete status line + header
@@ -57,6 +57,21 @@ resp = s.get("/user")
 resp.status
 #=> 200
 ```
+
+## Headers
+
+```ruby
+s = Http2::Session.new
+
+# Set the header explicitly
+s.headers["Accept"] = "application/json"
+s.headers.set :accept, "application/json" # Symbol or case-insensitive string
+s.headers.accept = "application/json"
+
+
+
+
+
 
 ## Hooks
 
