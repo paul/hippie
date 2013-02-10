@@ -1,6 +1,6 @@
-require "http2/header"
+require "hippie/header"
 
-module Http2
+module Hippie
   class Response
     attr_reader :state
 

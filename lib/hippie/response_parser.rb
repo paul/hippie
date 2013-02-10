@@ -1,6 +1,6 @@
 require 'celluloid'
 
-module Http2
+module Hippie
   class ResponseParser
     CRLF  = "\r\n"
     SP    = " "

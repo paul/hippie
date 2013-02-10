@@ -4,7 +4,7 @@
 ## The easy way
 
 ```ruby
-resp = Http2::Get("https://api.github.com/users/paul")
+resp = Hippie::Get("https://api.github.com/users/paul")
 resp.status_code               # (or #status, or #code)
 #=> 200
 resp.headers['Content-Type']   # (or :content_type)
@@ -24,13 +24,13 @@ Hippie::Put("https://api.github.com/user", json: {bio: "author of hippie"})
 
 ## Parallel requests
 
-`Http2` uses futures to make requests in parallel. Making a request doesn't block
+`Hippie` uses futures to make requests in parallel. Making a request doesn't block
 until you inspect certain attributes of the response.
 
 ```ruby
-r1 = Http2.get("https://api.github.com/users/paul")
+r1 = Hippie.get("https://api.github.com/users/paul")
 #=> #<Response:0x000...>
-r2 = Http2.get("https://api.github.com/users/pezra")
+r2 = Hippie.get("https://api.github.com/users/pezra")
 #=> #<Response:0x001...>
 
 r1.status
@@ -46,12 +46,12 @@ r2.raw_body
 
 Sessions are a series of requests where auth and cookies are persisted, request
 headers are remembered, redirects are automatically followed (according to
-spec), etc. Calling `Http2` request class methods creates a implicit, global
+spec), etc. Calling `Hippie` request class methods creates a implicit, global
 session, so you should probably avoid that in practice, and use this explicit
 Session object instead.
 
 ```ruby
-s = Http2::Session.new
+s = Hippie::Session.new
 s.auth = {user: "login", password: "token"}
 s.headers.update accept: 'application/vnd.github.v3+json')
 s.proto = "https"
@@ -66,7 +66,7 @@ resp.status
 ## Headers
 
 ```ruby
-s = Http2::Session.new
+s = Hippie::Session.new
 
 # Set the header explicitly
 s.headers["Accept"] = "application/json"
@@ -95,7 +95,7 @@ class JsonParser
   end
 end
 
-s = Http2::Session.new
+s = Hippie::Session.new
 s.response_hooks.append(JsonParser.new)
 
 resp = s.get("https://api.github.com/users/paul")

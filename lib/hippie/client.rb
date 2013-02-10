@@ -1,4 +1,4 @@
-module Http2
+module Hippie
   class Client
 
     def get(url)

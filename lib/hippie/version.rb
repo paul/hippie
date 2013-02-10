@@ -1,3 +1,3 @@
-module Http2
+module Hippie
   VERSION = "0.0.1"
 end

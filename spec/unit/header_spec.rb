@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Http2::Header do
+describe Hippie::Header do
 
   describe "setting values" do
 
@@ -8,7 +8,7 @@ describe Http2::Header do
 
   describe "reading values" do
 
-    let(:header) { Http2::Header.new }
+    let(:header) { Hippie::Header.new }
     subject { header }
 
     it "should handle case-insensitive lookups" do
@@ -18,7 +18,7 @@ describe Http2::Header do
       header["content_type"].should              == "text/plain"
       header[:content_type].should               == "text/plain"
       header.content_type.should                 == "text/plain"
-      header[Http2::Header::CONTENT_TYPE].should == "text/plain"
+      header[Hippie::Header::CONTENT_TYPE].should == "text/plain"
     end
 
     describe "with multiple values" do
@@ -46,7 +46,7 @@ Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
 If-Modified-Since:Thu, 24 Jan 2013 06:46:49 GMT
 If-None-Match:"6b140c-14e92-4d4032cd52840"
 STR
-    let(:header) { Http2::Header.new(header_str) }
+    let(:header) { Hippie::Header.new(header_str) }
 
     it "should have normal string headers as text" do
       header["User-Agent"].should == "curl/7.24.0 (x86_64-apple-darwin12.0) libcurl/7.24.0 OpenSSL/0.9.8r zlib/1.2.5"

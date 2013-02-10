@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'http2/version'
+require 'hippie/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = "http2"
-  gem.version       = Http2::VERSION
+  gem.name          = "hippie"
+  gem.version       = Hippie::VERSION
   gem.authors       = ["Paul Sadauskas"]
   gem.email         = ["psadauskas@gmail.com"]
   gem.description   = %q{TODO: Write a gem description}

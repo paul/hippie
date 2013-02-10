@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in http2.gemspec
+# Specify your gem's dependencies in hippie.gemspec
 gemspec
 
 group :test do

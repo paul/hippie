@@ -2,11 +2,11 @@ require 'spec_helper'
 
 require 'timeout'
 
-describe Http2::Response, "IO operations" do
+describe Hippie::Response, "IO operations" do
 
   before do
     @read, @write = IO.pipe
-    @response = Http2::Response.new @read
+    @response = Hippie::Response.new @read
   end
 
   describe "before connection established" do
