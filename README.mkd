@@ -4,17 +4,22 @@
 ## The easy way
 
 ```ruby
-resp = Http2.get("https://api.github.com/users/paul")
+resp = Http2::Get("https://api.github.com/users/paul")
 resp.status_code               # (or #status, or #code)
 #=> 200
-resp.headers['content-type']   # (or :content_type)
+resp.headers['Content-Type']   # (or :content_type)
 #=> "application/json; charset=utf8"
 resp.encoding
 #=> "utf-8"
 resp.body
 #=> "{\"type\":\"User\"...}"
+resp.json
+#=> {"type" => "User"...}
 resp.raw_body
 #=> #<IO...>
+
+# Automatically sets Content-Type to "application/json"
+Hippie::Put("https://api.github.com/user", json: {bio: "author of hippie"})
 ```
 
 ## Parallel requests

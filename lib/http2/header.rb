@@ -1,52 +1,54 @@
 module Http2
   class Header < Hash
 
-    class Field < String
+    class Value < String
+      extend Forwardable
+      array_methods = ([].methods - "".methods)
+      def_delegators :values, *array_methods
 
-      def self.new(field)
-        return field if field.is_a? Field
+      def self.new(value)
+        return value if value.is_a? Value
         super
       end
 
-      def initialize(string)
-        super(canonicalize(string))
+      def values
+        @values ||= self.split(',').map(&:strip)
       end
 
-      def eql?(other)
-        case other
-        when Field then super(other)
-        when String, Symbol then super(self.new(other))
-        else false
-        end
-      end
-      alias == eql?
+    end
 
-      # The pretty HTTP-Spec style header field name
-      # e.g., "Content-Type"
-      def canonicalize(string)
-        string.to_s.downcase.tr('_', '-').split('-').map(&:capitalize).join('-')
-      end
+    def initialize(headers = {})
+      headers.is_a?(Hash) ? super : parse(headers)
+    end
 
+    def parse(io)
+      io.each("\r\n") do |line|
+        field, val = line.split(":")
+        self[field] = val
+      end
     end
 
     def [](field)
-      super(Field.new(field))
+      super(canonicalize(field))
     end
 
     def []=(field, value)
-      super(Field.new(field), value)
+      super(canonicalize(field), Value.new(value.strip))
     end
 
     module Util
       def canonicalize(field_name)
         field_name.to_s.downcase.tr('_', '-').split('-').map(&:capitalize).join('-')
       end
+      module_function :canonicalize
 
       def methodize(field_name)
         field_name.to_s.downcase.tr('-', '_')
       end
+      module_function :methodize
     end
     extend Util
+    include Util
 
     GENERAL_HEADERS = %w[
       Cache-Control
@@ -58,7 +60,7 @@ module Http2
       Upgrade
       Via
       Warning
-    ].map { |f| Field.new(f) }
+    ]
 
     REQUEST_HEADERS = %w[
       Accept
@@ -80,7 +82,7 @@ module Http2
       Referer
       TE
       User-Agent
-    ].map { |f| Field.new(f) }
+    ]
 
     RESPONSE_HEADERS = %w[
       Accept-Ranges
@@ -92,7 +94,7 @@ module Http2
       Server
       Vary
       WWW-Authenticate
-    ].map { |f| Field.new(f) }
+    ]
 
     ENTITY_HEADERS = %w[
       Allow
@@ -105,7 +107,7 @@ module Http2
       Content-Type
       Expires
       Last-Modified
-    ].map { |f| Field.new(f) }
+    ]
 
     ALL_HEADERS = GENERAL_HEADERS + REQUEST_HEADERS + RESPONSE_HEADERS + ENTITY_HEADERS
 

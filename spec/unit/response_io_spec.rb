@@ -68,7 +68,7 @@ describe Http2::Response, "IO operations" do
       include Timeout
       def matches?(block)
         @block = block
-        timeout(0.1, &block)
+        timeout(0.05, &block)
         false
       rescue Timeout::Error
         true
