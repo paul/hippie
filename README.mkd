@@ -71,7 +71,7 @@ s = Hippie::Session.new
 s.headers["Accept"] = "application/json"
 s.headers.set :accept, "application/json" # Symbol or case-insensitive string
 s.headers.accept = "application/json"
-
+```
 
 
 
@@ -93,7 +93,7 @@ class JsonParser
     response.body = parser.parse(response.raw_body)
   end
 end
-```
+
 
 s = Hippie::Session.new
 s.response_hooks.append(JsonParser.new)
